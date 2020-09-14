@@ -215,7 +215,28 @@ MatrixXf QuadEstimatorEKF::GetRbgPrime(float roll, float pitch, float yaw)
   //   that your calculations are reasonable
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
+  // Equation 52 of Estimations for Quadrotors
 
+  float cosTHETA = cos(pitch);
+  float sinTHETA = sin(pitch);
+
+  float cosPHI = cos(roll);
+  float sinPHI = sin(roll);
+
+  float sinPSI = sin(yaw);
+  float cosPSI = cos(yaw);
+
+  RbgPrime(0, 0) = -cosTHETA * sinPSI;
+  RbgPrime(0, 1) = -sinPHI * sinTHETA * sinPSI - cosTHETA * cosPSI;
+  RbgPrime(0, 2) = -cosPHI * sinTHETA * sinPSI + sinPHI * cosPSI;
+
+  RbgPrime(1, 0) = cosTHETA * cosPSI;
+  RbgPrime(1, 1) = sinPHI * sinTHETA * cosPSI - cosPHI * sinPSI;
+  RbgPrime(1, 2) = cosPHI * sinTHETA * cosPSI + sinPHI * sinPSI;
+
+  RbgPrime(2, 0) = 0.0;
+  RbgPrime(2, 1) = 0.0;
+  RbgPrime(2, 2) = 0.0;
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
