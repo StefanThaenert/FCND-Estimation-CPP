@@ -93,9 +93,28 @@ void QuadEstimatorEKF::UpdateFromIMU(V3F accel, V3F gyro)
   // (replace the code below)
   // make sure you comment it out when you add your own code -- otherwise e.g. you might integrate yaw twice
 
-  float predictedPitch = pitchEst + dtIMU * gyro.y;
-  float predictedRoll = rollEst + dtIMU * gyro.x;
-  ekfState(6) = ekfState(6) + dtIMU * gyro.z;	// yaw
+  //float predictedPitch = pitchEst + dtIMU * gyro.y;
+  //float predictedRoll = rollEst + dtIMU * gyro.x;
+  //ekfState(6) = ekfState(6) + dtIMU * gyro.z;	// yaw
+
+    float PHI = rollEst;
+    float THETA = pitchEst;
+
+// Formula for Euler angles given in e.g. Controls/Lesson 4/21.3D Drone Part 5 Exercise/Exercise 3
+    Mat3x3F ROT = Mat3x3F::Zeros();
+    ROT(0, 0) = 1;
+    ROT(0, 1) = sin(PHI) * tan(THETA);
+    ROT(0, 2) = cos(PHI) * tan(THETA);
+    ROT(1, 1) = cos(PHI);
+    ROT(1, 2) = -sin(PHI);
+    ROT(2, 1) = sin(PHI) / cos(THETA);
+    ROT(2, 2) = cos(PHI) / cos(THETA);
+
+    V3F angle_dot = ROT * gyro;
+
+    float predictedRoll = PHI + dtIMU * angle_dot.x;
+    float predictedPitch = THETA + dtIMU * angle_dot.y;
+    ekfState(6) = ekfState(6) + dtIMU * angle_dot.z;
 
   // normalize yaw to -pi .. pi
   if (ekfState(6) > F_PI) ekfState(6) -= 2.f*F_PI;
